@@ -1,0 +1,93 @@
+{
+  "updated_utc": "2026-11-12T22:51:13.897149+00:00",
+  "events": [
+    {
+      "event_id": "401933535",
+      "date": "2026-11-20T00:30:00+00:00",
+      "season": 2026,
+      "home_team": "Orlando City SC",
+      "away_team": "FC Cincinnati",
+      "home_goals": null,
+      "away_goals": null,
+      "state": "scheduled",
+      "status": "Scheduled"
+    },
+    {
+      "event_id": "401933555",
+      "date": "2026-11-20T03:00:00+00:00",
+      "season": 2026,
+      "home_team": "Seattle Sounders FC",
+      "away_team": "Real Salt Lake",
+      "home_goals": null,
+      "away_goals": null,
+      "state": "scheduled",
+      "status": "Scheduled"
+    },
+    {
+      "event_id": "401933733",
+      "date": "2026-11-21T19:00:00+00:00",
+      "season": 2026,
+      "home_team": "New England Revolution",
+      "away_team": "Philadelphia Union",
+      "home_goals": null,
+      "away_goals": null,
+      "state": "scheduled",
+      "status": "Scheduled"
+    },
+    {
+      "event_id": "401933732",
+      "date": "2026-11-21T21:00:00+00:00",
+      "season": 2026,
+      "home_team": "FC Dallas",
+      "away_team": "Portland Timbers",
+      "home_goals": null,
+      "away_goals": null,
+      "state": "scheduled",
+      "status": "Scheduled"
+    },
+    {
+      "event_id": "401933739",
+      "date": "2026-11-21T23:00:00+00:00",
+      "season": 2026,
+      "home_team": "Inter Miami CF",
+      "away_team": "Columbus Crew",
+      "home_goals": null,
+      "away_goals": null,
+      "state": "scheduled",
+      "status": "Scheduled"
+    },
+    {
+      "event_id": "401933731",
+      "date": "2026-11-22T21:00:00+00:00",
+      "season": 2026,
+      "home_team": "Nashville SC",
+      "away_team": "TBD Away",
+      "home_goals": null,
+      "away_goals": null,
+      "state": "scheduled",
+      "status": "Scheduled"
+    },
+    {
+      "event_id": "401933730",
+      "date": "2026-11-22T23:30:00+00:00",
+      "season": 2026,
+      "home_team": "Chicago Fire FC",
+      "away_team": "Charlotte FC",
+      "home_goals": null,
+      "away_goals": null,
+      "state": "scheduled",
+      "status": "Scheduled"
+    },
+    {
+      "event_id": "401933729",
+      "date": "2026-11-23T01:30:00+00:00",
+      "season": 2026,
+      "home_team": "Vancouver Whitecaps",
+      "away_team": "TBD Away",
+      "home_goals": null,
+      "away_goals": null,
+      "state": "scheduled",
+      "status": "Scheduled"
+    }
+  ]
+}
