@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Activity, ArrowDownUp, ArrowRight, CalendarDays, CheckCircle2,
-    ChevronDown, CircleAlert, Clock3, Code2, RefreshCw, Shield,
-    Signal, Sparkles, Trophy, Zap,
-     } from "lucide-react";
+import {
+  Activity, ArrowDownUp, ArrowRight, CalendarDays, CheckCircle2,
+  ChevronDown, CircleAlert, Clock3, Code2, RefreshCw, Shield,
+  Signal, Sparkles, Trophy, Zap,
+} from 'lucide-react'
+
 const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
 
 async function api(path, options = {}) {
@@ -22,6 +24,21 @@ function formatKickoff(value) {
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return value
   return date.toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
+}
+
+function TeamCrest({ name, logos = {}, className = '' }) {
+  const [failed, setFailed] = useState(false)
+  const src = logos[name]
+  useEffect(() => setFailed(false), [src])
+  return (
+    <span className={`team-crest ${className}`} aria-label={`${name || 'Team'} crest`}>
+      {src && !failed ? (
+        <img src={src} alt="" loading="lazy" onError={() => setFailed(true)} />
+      ) : (
+        <Shield size={19} aria-hidden="true" />
+      )}
+    </span>
+  )
 }
 
 function FormDots({ form = [] }) {
@@ -64,6 +81,7 @@ export default function App() {
   const [predicting, setPredicting] = useState(false)
   const [error, setError] = useState('')
   const [fixtureError, setFixtureError] = useState('')
+  const [logos, setLogos] = useState({})
 
   const homeTeam = useMemo(() => teams.find(team => team.name === home), [teams, home])
   const awayTeam = useMemo(() => teams.find(team => team.name === away), [teams, away])
@@ -95,7 +113,11 @@ export default function App() {
     }
   }
 
-  useEffect(() => { loadDashboard() }, [])
+  useEffect(() => {
+    loadDashboard()
+    // Team crests are optional: missing permissions/network must never break predictions.
+    api('/api/team-logos').then(data => setLogos(data.logos || {})).catch(() => setLogos({}))
+  }, [])
 
   useEffect(() => {
     setPrediction(null)
@@ -130,7 +152,7 @@ export default function App() {
       <div className="ambient ambient-two" />
       <header className="topbar">
         <a className="brand" href="#" aria-label="MLS Match Predictor home">
-          <span className="brand-mark"><Activity size={21} /></span>
+          <span className="brand-mark"><img src="/mls-predict-logo.png" alt="MLS Predict logo" /></span>
           <span>MLS<span className="brand-light">PREDICT</span></span>
         </a>
         <div className="topbar-right">
@@ -169,7 +191,7 @@ export default function App() {
           </div>
         )}
 
-        <section className="section-grid">
+        <section className="section-grid" id="matchup">
           <div className="panel matchup-panel">
             <div className="panel-head">
               <div><span className="section-kicker">01 / MATCH CENTRE</span><h2>Build your matchup</h2></div>
@@ -179,23 +201,25 @@ export default function App() {
               <div className="team-selectors">
                 <label className="team-field">
                   <span className="field-label">HOME TEAM</span>
-                  <span className="select-wrap">
-                    <Shield size={19} />
-                    <select value={home} onChange={event => setHome(event.target.value)} disabled={loading || !teams.length}>
+                  <span className="select-wrap select-wrap-overlay">
+                    <TeamCrest name={home} logos={logos} />
+                    <span className="selected-team-name" aria-hidden="true">{home || 'Choose home team'}</span>
+                    <ChevronDown size={16} aria-hidden="true" />
+                    <select aria-label="Home team" value={home} onChange={event => setHome(event.target.value)} disabled={loading || !teams.length}>
                       {teams.map(team => <option value={team.name} key={team.name}>{team.name}</option>)}
                     </select>
-                    <ChevronDown size={16} />
                   </span>
                 </label>
                 <div className="versus"><span>VS</span><ArrowDownUp size={15} /></div>
                 <label className="team-field">
                   <span className="field-label">AWAY TEAM</span>
-                  <span className="select-wrap">
-                    <Shield size={19} />
-                    <select value={away} onChange={event => setAway(event.target.value)} disabled={loading || !teams.length}>
-                      {teams.filter(team => team.name !== home || team.name === away).map(team => <option value={team.name} key={team.name}>{team.name}</option>)}
+                  <span className="select-wrap select-wrap-overlay">
+                    <TeamCrest name={away} logos={logos} />
+                    <span className="selected-team-name" aria-hidden="true">{away || 'Choose away team'}</span>
+                    <ChevronDown size={16} aria-hidden="true" />
+                    <select aria-label="Away team" value={away} onChange={event => setAway(event.target.value)} disabled={loading || !teams.length}>
+                      {teams.map(team => <option value={team.name} key={team.name}>{team.name}</option>)}
                     </select>
-                    <ChevronDown size={16} />
                   </span>
                 </label>
               </div>
@@ -221,7 +245,7 @@ export default function App() {
           </div>
         </section>
 
-        <section className="panel prediction-panel">
+        <section className="panel prediction-panel" id="predictions">
           <div className="panel-head">
             <div><span className="section-kicker">02 / MODEL OUTPUT</span><h2>Outcome probabilities</h2></div>
             <span className="subtle-chip">THREE-WAY RESULT</span>
@@ -247,12 +271,12 @@ export default function App() {
           )}
         </section>
 
-        <section className="form-section">
+        <section className="form-section" id="form">
           <div className="section-title-row"><div><span className="section-kicker">03 / TEAM INTELLIGENCE</span><h2>Recent form</h2></div><span className="subtle-chip">LAST FIVE COMPLETED</span></div>
           <div className="form-grid">
             {[{team: homeTeam, label: 'HOME FORM'}, {team: awayTeam, label: 'AWAY FORM'}].map((item, index) => (
               <div className="panel form-card" key={item.label}>
-                <div className="form-card-top"><span>{item.label}</span><Shield size={19} /></div>
+                <div className="form-card-top"><span>{item.label}</span><TeamCrest name={item.team?.name} logos={logos} /></div>
                 <h3>{item.team?.name || 'Select a team'}</h3>
                 <FormDots form={item.team?.form || []} />
                 <div className="stat-grid">
@@ -265,7 +289,7 @@ export default function App() {
           </div>
         </section>
 
-        <section className="panel fixtures-panel">
+        <section className="panel fixtures-panel" id="fixtures">
           <div className="panel-head">
             <div><span className="section-kicker">04 / MATCH SCHEDULE</span><h2>Fixtures & recent scores</h2></div>
             <div className="fixture-updated"><Clock3 size={14} /> {fixtureUpdated ? `Updated ${formatKickoff(fixtureUpdated)}` : 'No saved update'}</div>
@@ -277,14 +301,14 @@ export default function App() {
               {upcoming.map((event, index) => (
                 <div className="fixture-row" key={event.event_id || `${event.date}-${index}`}>
                   <div className="fixture-date"><strong>{formatKickoff(event.date)}</strong><span>{event.state === 'live' ? 'IN PROGRESS' : 'SCHEDULED'} · LOCAL TIME</span></div>
-                  <div className="fixture-teams"><span>{event.home_team}</span><b>{event.state === 'live' ? `${event.home_goals ?? '—'} : ${event.away_goals ?? '—'}` : 'VS'}</b><span>{event.away_team}</span></div>
+                  <div className="fixture-teams"><span className="fixture-team home"><span>{event.home_team}</span><TeamCrest name={event.home_team} logos={logos} /></span><b>{event.state === 'live' ? `${event.home_goals ?? '—'} : ${event.away_goals ?? '—'}` : 'VS'}</b><span className="fixture-team away"><TeamCrest name={event.away_team} logos={logos} /><span>{event.away_team}</span></span></div>
                   <span className={`fixture-status ${event.state}`}>{event.state}</span>
                 </div>
               ))}
               {completed.map((event, index) => (
                 <div className="fixture-row completed" key={event.event_id || `final-${index}`}>
                   <div className="fixture-date"><strong>{formatKickoff(event.date)}</strong><span>FINAL · LOCAL TIME</span></div>
-                  <div className="fixture-teams"><span>{event.home_team}</span><b>{event.home_goals} : {event.away_goals}</b><span>{event.away_team}</span></div>
+                  <div className="fixture-teams"><span className="fixture-team home"><span>{event.home_team}</span><TeamCrest name={event.home_team} logos={logos} /></span><b>{event.home_goals} : {event.away_goals}</b><span className="fixture-team away"><TeamCrest name={event.away_team} logos={logos} /><span>{event.away_team}</span></span></div>
                   <span className="fixture-status final">FINAL</span>
                 </div>
               ))}
@@ -294,10 +318,16 @@ export default function App() {
         </section>
 
         <footer className="footer">
-          <div className="brand small-brand"><span className="brand-mark"><Activity size={16} /></span><span>MLS<span className="brand-light">PREDICT</span></span></div>
+          <div className="brand small-brand"><span className="brand-mark"><img src="/mls-predict-logo.png" alt="" /></span><span>MLS<span className="brand-light">PREDICT</span></span></div>
           <span>Built for football analytics · Not betting advice</span>
           <a href="https://github.com/calkarawoh/MLS-Match-Predictor" target="_blank" rel="noreferrer">VIEW SOURCE <ArrowRight size={13} /></a>
         </footer>
+        <nav className="mobile-nav" aria-label="Mobile quick navigation">
+          <a href="#matchup"><Shield size={19}/><span>Match</span></a>
+          <a href="#predictions"><Activity size={19}/><span>Predict</span></a>
+          <a href="#form"><Trophy size={19}/><span>Form</span></a>
+          <a href="#fixtures"><CalendarDays size={19}/><span>Fixtures</span></a>
+        </nav>
       </main>
     </div>
   )

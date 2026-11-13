@@ -188,3 +188,122 @@ h1 span { color: var(--green); }
   .prediction-result { align-items: flex-start; flex-direction: column; }
   .footer > span { order: 3; width: 100%; }
 }
+
+
+/* PREMIUM DARK — custom blue/silver identity based on the owner's logo */
+:root {
+  --bg: #080b14;
+  --panel: rgba(17, 21, 37, .94);
+  --panel2: #12172a;
+  --line: rgba(154, 171, 218, .15);
+  --muted: #99a4bb;
+  --green: #66aaff;
+  --green2: #8b8dff;
+  --cyan: #67dbff;
+  --yellow: #f4ca86;
+  --red: #ff8499;
+}
+html { scroll-behavior: smooth; }
+body { color: #edf2ff; background: #080b14; }
+.app-shell {
+  background:
+    radial-gradient(ellipse 65% 32% at 48% 0%, rgba(97,104,212,.23), transparent 80%),
+    radial-gradient(ellipse 46% 35% at 100% 60%, rgba(44,111,197,.1), transparent 80%),
+    #080b14;
+}
+.ambient-one { background: #515bff; }
+.ambient-two { background: #1aa3f2; }
+.topbar { border-bottom-color: rgba(154,171,218,.15); }
+.brand { letter-spacing: .045em; }
+.brand-mark {
+  width: 42px; height: 42px; background: #0b1020;
+  border: 1px solid rgba(113,165,255,.33);
+  border-radius: 14px;
+  box-shadow: inset 0 0 20px rgba(75,114,236,.12),0 0 17px rgba(74,108,255,.11);
+  overflow: hidden;
+}
+.brand-mark img { width: 100%; height: 100%; object-fit: contain; padding: 3px; }
+.brand-light { background: linear-gradient(90deg,#91b9ff,#aa9bff); color: transparent; background-clip: text; }
+.pulse { background: #8695ff; }
+.connection.online { color: #9baaff; }
+.hero { position: relative; }
+.hero h1 span { background: linear-gradient(100deg,#80bcff 0%,#a698ff 64%,#d1a9ff); color: transparent; background-clip: text; }
+.hero-orb { color: #9d9bff; border-color: rgba(130,145,255,.22); background: linear-gradient(140deg,rgba(93,106,226,.23),rgba(34,53,112,.06)); box-shadow: inset 0 0 35px rgba(115,133,245,.06),0 0 65px rgba(81,88,228,.1); }
+.eyebrow, .section-kicker { color: #9299ff; }
+.eyebrow-line { background: #9299ff; }
+.hero-meta svg { color: #8b9dff; }
+.panel { background: linear-gradient(145deg,rgba(19,24,42,.96),rgba(13,17,31,.96)); border-color: rgba(148,166,227,.16); box-shadow: 0 24px 58px rgba(0,0,0,.17); }
+.status-panel { background: linear-gradient(145deg,rgba(27,30,55,.97),rgba(14,19,34,.97)); }
+.live-tag, .subtle-chip { color: #a1a3ff; border-color: rgba(157,151,255,.24); }
+.select-wrap { background: #0a1020; border-color: rgba(166,183,237,.17); color: #92b5ff; }
+.select-wrap:focus-within { border-color: rgba(129,150,255,.7); box-shadow: 0 0 0 3px rgba(132,142,255,.12); }
+.select-wrap select { color: #f3f5ff; }
+.select-wrap select option { background: #11172a; }
+.versus svg, .form-card-top, .muted-icon, .hero-meta svg { color: #8f9bff; }
+.predict-button { background: linear-gradient(105deg,#729eff 0%,#9990ff 100%); color: #080d21; box-shadow: 0 6px 25px rgba(108,115,255,.1); }
+.predict-button:hover:not(:disabled) { background: linear-gradient(105deg,#91b9ff,#b5a6ff); box-shadow: 0 10px 35px rgba(112,112,255,.24); }
+.text-button { color: #a4a5ff; }
+.text-button:hover { color: #c2c0ff; }
+.status-line strong.good, .result-check, .fixture-teams b { color: #91b4ff; }
+.empty-icon { color: #a1a3ff; background: rgba(139,141,255,.12); }
+.track { background: #242b45; }
+.fill.home { background: linear-gradient(90deg,#3d8df1,#9ca7ff); }
+.fill.draw { background: linear-gradient(90deg,#d39d64,#f7cd85); }
+.fill.away { background: linear-gradient(90deg,#ae5baa,#f19bc9); }
+.form-dot.w { background: #8eadff; }
+.form-dot.d { background: #f4ce85; }
+.form-dot.l { background: #ed8ca5; }
+.fixture-status.live { color: #9da5ff; }
+.footer > a { color: #9b9cff; }
+.small-brand .brand-mark { width: 30px; height: 30px; border-radius: 9px; }
+.mobile-nav { display: none; }
+@media (max-width: 760px) {
+  .main-content { padding-bottom: 100px; }
+  .mobile-nav {
+    display: grid; grid-template-columns: repeat(4,1fr); gap: 4px;
+    position: fixed; bottom: max(12px, env(safe-area-inset-bottom)); left: 50%;
+    transform: translateX(-50%); z-index: 60;
+    width: calc(100% - 26px); max-width: 470px;
+    background: rgba(15,20,38,.94); border: 1px solid rgba(150,165,233,.2);
+    border-radius: 19px; padding: 9px 8px;
+    box-shadow: 0 16px 40px rgba(0,0,0,.55); backdrop-filter: blur(25px);
+  }
+  .mobile-nav a { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 2px; color: #a9b1cf; font-size: 10px; font-weight: 700; border-radius: 12px; }
+  .mobile-nav a:focus-visible, .mobile-nav a:hover { outline: none; background: rgba(126,135,255,.12); color: #c7caff; }
+  #matchup, #predictions, #form, #fixtures { scroll-margin-top: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+/* Club crests — names still appear even when images cannot load. */
+.team-crest { width: 29px; height: 29px; flex: 0 0 29px; display: inline-grid; place-items: center; border-radius: 8px; background: rgba(129,150,255,.09); color: #99aeff; overflow: hidden; }
+.team-crest img { width: 100%; height: 100%; object-fit: contain; }
+.team-crest svg { width: 19px; height: 19px; }
+.select-wrap .team-crest { background: transparent; }
+.form-card-top .team-crest { height: 37px; width: 37px; flex-basis: 37px; }
+.form-card-top .team-crest img { padding: 2px; }
+.fixture-team { display: flex; align-items: center; gap: 7px; min-width: 0; }
+.fixture-team > span:not(.team-crest) { min-width: 0; }
+.fixture-team.home { justify-content: flex-end; text-align: right; }
+.fixture-team.away { justify-content: flex-start; text-align: left; }
+.fixture-team .team-crest { width: 25px; height: 25px; flex-basis: 25px; border-radius: 6px; }
+.fixture-teams .fixture-team:first-child, .fixture-teams .fixture-team:last-child { text-align: inherit; }
+@media (max-width: 430px) { .fixture-team { gap: 5px; } .fixture-team .team-crest { width: 21px; height: 21px; flex-basis: 21px; } }
+
+/* v1.2.1: Entire team card is a native, accessible dropdown hit target. */
+.select-wrap-overlay { position: relative; isolation: isolate; cursor: pointer; }
+.select-wrap-overlay > .team-crest,
+.select-wrap-overlay > .selected-team-name,
+.select-wrap-overlay > svg { pointer-events: none; }
+.select-wrap-overlay .selected-team-name {
+  display: block; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap; color: #f3f5ff; font-size: 12px; font-weight: 700;
+}
+.select-wrap-overlay select {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  opacity: 0.01; z-index: 2; padding: 0; margin: 0;
+  appearance: auto; cursor: pointer;
+}
+.select-wrap-overlay:has(select:disabled) { opacity: .6; cursor: not-allowed; }
+.select-wrap-overlay select:focus-visible { outline: 2px solid #97a6ff; outline-offset: 3px; }

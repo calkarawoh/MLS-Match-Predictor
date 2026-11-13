@@ -1,0 +1,6 @@
+# Add these lines to the existing .gitignore if desired
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+__pycache__/
+*.pyc

@@ -180,3 +180,59 @@ def reload_data() -> dict[str, Any]:
         "model_loaded": model_bundle is not None,
         "message": "Local history and model reloaded.",
     }
+
+
+# Logos are optional. The source is ESPN's unofficial team directory;
+# its availability and permission to display images publicly are not guaranteed.
+# For a public deployment, confirm permitted use or provide licensed assets.
+from functools import lru_cache
+import re
+import requests
+
+
+def _normalise_team(name: str) -> str:
+    return re.sub(r"[^a-z0-9]", "", str(name).casefold())
+
+
+@lru_cache(maxsize=1)
+def _provider_team_crests() -> dict[str, str]:
+    try:
+        with requests.Session() as session:
+            payload = mls_live_data.fetch_json(session, "teams", {"limit": 100})
+        sports = payload.get("sports") or []
+        leagues = (sports[0].get("leagues") or []) if sports else []
+        wrappers = (leagues[0].get("teams") or []) if leagues else []
+        found: dict[str, str] = {}
+        for entry in wrappers:
+            team = entry.get("team") or entry
+            logo_sources = team.get("logos") or []
+            href = logo_sources[0].get("href") if logo_sources else team.get("logo")
+            # Only display images from the expected ESPN CDN; do not pass through arbitrary URLs.
+            if not isinstance(href, str) or not href.startswith(("https://a.espncdn.com/", "https://cdn.espn.com/")):
+                continue
+            for key in ("displayName", "shortDisplayName", "name"):
+                name = team.get(key)
+                if name:
+                    found[_normalise_team(name)] = href
+        return found
+    except (RuntimeError, KeyError, IndexError, AttributeError, TypeError):
+        return {}
+
+
+@app.get("/api/team-logos")
+def team_logos() -> dict[str, Any]:
+    provider_logos = _provider_team_crests()
+    mapping: dict[str, str] = {}
+    for team in team_history.keys():
+        key = _normalise_team(team)
+        found = provider_logos.get(key)
+        # Match suffix changes such as 'FC' only when there is a unique candidate.
+        if found is None:
+            matches = [url for candidate, url in provider_logos.items()
+                       if candidate.startswith(key) or key.startswith(candidate)]
+            if len(set(matches)) == 1:
+                found = matches[0]
+        if found:
+            mapping[team] = found
+    return {"logos": mapping, "matched_count": len(mapping),
+            "source_note": "Unofficial ESPN team logo URLs; verify permitted use before public hosting."}
