@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import {
   Activity, ArrowDownUp, ArrowRight, CalendarDays, CheckCircle2,
   ChevronDown, CircleAlert, Clock3, Code2, RefreshCw, Shield,
-  Signal, Sparkles, Trophy, Zap,
+  Signal, Sparkles, Trophy, Zap, Target, BarChart3,
 } from 'lucide-react'
 
 const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
@@ -82,6 +82,17 @@ export default function App() {
   const [error, setError] = useState('')
   const [fixtureError, setFixtureError] = useState('')
   const [logos, setLogos] = useState({})
+
+  const metrics = prediction?.probabilities
+  const probabilities = metrics ? [
+    { label: 'Home win', value: Number(metrics.home_win || 0), tone: 'home' },
+    { label: 'Draw', value: Number(metrics.draw || 0), tone: 'draw' },
+    { label: 'Away win', value: Number(metrics.away_win || 0), tone: 'away' },
+  ] : []
+  const topOutcome = probabilities.length
+    ? probabilities.reduce((best, item) => item.value > best.value ? item : best, probabilities[0])
+    : null
+  const percent = value => `${(Math.max(0, Number(value || 0)) * 100).toFixed(1)}%`
 
   const homeTeam = useMemo(() => teams.find(team => team.name === home), [teams, home])
   const awayTeam = useMemo(() => teams.find(team => team.name === away), [teams, away])
@@ -174,7 +185,7 @@ export default function App() {
               <h1>Predict the<br /><span>unpredictable.</span></h1>
               <p className="hero-copy">MLS match insights powered by historical results and machine learning.</p>
             </div>
-            <div className="hero-orb"><Trophy size={43} strokeWidth={1.25} /></div>
+            <div className="hero-orb" aria-hidden="true"><div className="orb-inner"><Target size={47} strokeWidth={1.35} /></div><span className="orb-orbit" /></div>
           </div>
           <div className="hero-meta">
             <span><Signal size={14} /> REAL MATCH HISTORY</span>
@@ -198,6 +209,7 @@ export default function App() {
               <span className="live-tag"><span className="pulse" /> PREDICT</span>
             </div>
             <form onSubmit={runPrediction}>
+              <div className="matchup-intro"><span><span className="micro-dot" /> BUILD A PREDICTION</span><span>HOME ADVANTAGE INCLUDED</span></div>
               <div className="team-selectors">
                 <label className="team-field">
                   <span className="field-label">HOME TEAM</span>
@@ -210,7 +222,7 @@ export default function App() {
                     </select>
                   </span>
                 </label>
-                <div className="versus"><span>VS</span><ArrowDownUp size={15} /></div>
+                <div className="versus"><span>VS</span><button className="swap-teams" type="button" title="Swap home and away teams" aria-label="Swap home and away teams" onClick={() => { setHome(away); setAway(home) }}><ArrowDownUp size={17} /></button></div>
                 <label className="team-field">
                   <span className="field-label">AWAY TEAM</span>
                   <span className="select-wrap select-wrap-overlay">
@@ -222,6 +234,11 @@ export default function App() {
                     </select>
                   </span>
                 </label>
+              </div>
+              <div className="matchup-preview" aria-label="Selected matchup preview">
+                <div className="preview-club"><TeamCrest name={home} logos={logos} className="hero-crest"/><span>{home || 'Home team'}</span><small>HOME</small></div>
+                <div className="preview-mid"><span>HEAD TO HEAD</span><strong>VS</strong><i /></div>
+                <div className="preview-club"><TeamCrest name={away} logos={logos} className="hero-crest"/><span>{away || 'Away team'}</span><small>AWAY</small></div>
               </div>
               <button className="predict-button" type="submit" disabled={loading || predicting || !modelReady || !home || !away || home === away}>
                 {predicting ? <><RefreshCw className="spin" size={18} /> ANALYZING MATCH</> : <><Sparkles size={18} /> PREDICT MATCH <ArrowRight size={18} /></>}
@@ -237,6 +254,7 @@ export default function App() {
               <div><span className="section-kicker">SYSTEM STATUS</span><h2>Model health</h2></div>
               <Activity size={19} className="muted-icon" />
             </div>
+            <div className="system-feature"><span className="system-feature-icon"><BarChart3 size={20}/></span><div><strong>Match intelligence</strong><small>Historical MLS performance model</small></div></div>
             <div className="status-line"><span>Historical data</span><strong className={health?.history_loaded ? 'good' : 'bad'}>{health?.history_loaded ? 'Connected' : 'Unavailable'}</strong></div>
             <div className="status-line"><span>Prediction model</span><strong className={modelReady ? 'good' : 'bad'}>{modelReady ? 'Ready' : 'Not loaded'}</strong></div>
             <div className="status-line"><span>Completed matches</span><strong>{health?.matches_loaded?.toLocaleString?.() ?? '—'}</strong></div>
@@ -257,6 +275,21 @@ export default function App() {
             </div>
           ) : (
             <>
+              <div className="prediction-summary">
+                <div className="outcome-focus">
+                  <span className="section-kicker">HIGHEST ESTIMATED OUTCOME</span>
+                  <div className="outcome-name">{topOutcome?.label}</div>
+                  <div className="outcome-big">{percent(topOutcome?.value)}</div>
+                  <p>Model-estimated probability, not a guaranteed result.</p>
+                </div>
+                <div className="probability-donut" role="img" aria-label={`Model estimates: home win ${percent(metrics.home_win)}, draw ${percent(metrics.draw)}, away win ${percent(metrics.away_win)}`} style={{ '--home-pct': `${Math.max(0, Math.min(100, Number(metrics.home_win || 0) * 100))}%`, '--draw-end': `${Math.max(0, Math.min(100, Number(metrics.home_win || 0) * 100 + Number(metrics.draw || 0) * 100))}%` }}>
+                  <div className="donut-core"><Target size={22}/><span>3-WAY</span></div>
+                </div>
+              </div>
+              <div className="prediction-strip" aria-label="Prediction probability breakdown">
+                {probabilities.map(item => <span key={item.tone} className={`strip-segment ${item.tone}`} style={{ flexGrow: Math.max(item.value, 0.002) }} title={`${item.label}: ${percent(item.value)}`} />)}
+              </div>
+              <div className="prediction-legend">{probabilities.map(item => <div key={item.tone}><i className={`legend-dot ${item.tone}`} /><span>{item.label}</span><strong>{percent(item.value)}</strong></div>)}</div>
               <div className="prediction-result">
                 <div><span className="section-kicker">MODEL'S TOP OUTCOME</span><strong>{prediction.top_prediction}</strong></div>
                 <span className="result-check"><CheckCircle2 size={18} /> CALCULATED</span>
@@ -278,6 +311,7 @@ export default function App() {
               <div className="panel form-card" key={item.label}>
                 <div className="form-card-top"><span>{item.label}</span><TeamCrest name={item.team?.name} logos={logos} /></div>
                 <h3>{item.team?.name || 'Select a team'}</h3>
+                <div className="form-caption"><span>LAST 5 RESULTS</span><span>W / D / L</span></div>
                 <FormDots form={item.team?.form || []} />
                 <div className="stat-grid">
                   <div><strong>{item.team?.goals_for_per_match?.toFixed(2) ?? '—'}</strong><span>GF / MATCH</span></div>
