@@ -1,0 +1,9 @@
+
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://mls-match-predictor.onrender.com/api/:path*"
+    }
+  ]
+}
